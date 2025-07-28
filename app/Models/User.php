@@ -44,23 +44,19 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
-    public function pengumuman()
+    // Relasi
+    public function barber()
     {
-        return $this->hasMany(Pengumuman::class);
+        return $this->hasOne(Barber::class, 'pengguna_id');
     }
 
-    public function halaman()
+    public function pemesanan()
     {
-        return $this->hasMany(Halaman::class);
+        return $this->hasMany(Pemesanan::class, 'pengguna_id');
     }
 
-    public function pelanggan()
+    public function transaksi()
     {
-        return $this->hasMany(Pelanggan::class);
-    }
-
-    public function pelangganOne()
-    {
-        return $this->hasOne(Pelanggan::class);
+        return $this->hasMany(Transaksi::class, 'pengguna_id');
     }
 }

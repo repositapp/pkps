@@ -20,29 +20,15 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        User::updateOrCreate([
-            'name' => 'Administrator',
-            'username' => 'admin',
-            'email' => 'admin@themesbrand.com',
-            'email_verified_at' => now(),
-            'password' => Hash::make('12345678'),
-            'avatar' => 'users-images/1J7iwiUja9gMqtHL7eIzR6RbaH0rrzZ5buklDQLy.png',
-            'role' => 'admin',
-            'status' => '1',
-            'created_at' => now(),
+        $this->call([
+            UserSeeder::class,
+            BarberSeeder::class,
+            LayananSeeder::class,
+            JadwalSeeder::class,
+            PemesananSeeder::class,
+            AntrianSeeder::class,
+            TransaksiSeeder::class,
         ]);
-        User::updateOrCreate([
-            'name' => 'Pelanggan',
-            'username' => 'pelanggan',
-            'email' => 'pelanggan@themesbrand.com',
-            'email_verified_at' => now(),
-            'password' => Hash::make('12345678'),
-            'avatar' => 'users-images/1J7iwiUja9gMqtHL7eIzR6RbaH0rrzZ5buklDQLy.png',
-            'role' => 'pelanggan',
-            'status' => '1',
-            'created_at' => now(),
-        ]);
-        User::factory(29)->create();
 
         Aplikasi::updateOrCreate([
             'nama_lembaga' => 'Perusahaan Umum Daerah Air Minum Tirta Takawa',
@@ -354,14 +340,6 @@ class DatabaseSeeder extends Seeder
             'parent_id' => null,
             'order' => 2,
             'status' => 1,
-        ]);
-
-        $this->call([
-            PelangganSeeder::class,
-            TagihanSeeder::class,
-            PengaduanSeeder::class,
-            PemasanganSeeder::class,
-            PemutusanSeeder::class,
         ]);
     }
 }
