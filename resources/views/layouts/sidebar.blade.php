@@ -21,52 +21,43 @@
                 </a>
             </li>
             <li class="header">MAIN NAVIGATION</li>
-            <li class="treeview {{ Request::is('panel/kategori*') ? 'active menu-open' : '' }}">
-                <a href="#">
-                    <i class="fa fa-cubes"></i>
-                    <span>Master Data</span>
-                    <span class="pull-right-container">
-                        <i class="fa fa-angle-left pull-right"></i>
-                    </span>
-                </a>
-                <ul class="treeview-menu">
-                    <li class="{{ Request::is('panel/kategori*') ? 'active' : '' }}"><a
-                            href="{{ route('kategori.index') }}"><i class="fa fa-circle-o"></i> Kategori</a></li>
-                </ul>
-            </li>
-            <li class="{{ Request::is('panel/pengumuman*') ? 'active' : '' }}">
-                <a href="{{ route('pengumuman.index') }}"><i class="fa fa-bullhorn"></i><span>Pengumuman</span></a>
-            </li>
-            <li class="header">More</li>
-            <li class="treeview {{ Request::is('panel/halaman*', 'panel/menu*') ? 'active menu-open' : '' }}">
-                <a href="#">
-                    <i class="fa fa-television"></i> <span>Modul</span>
-                    <span class="pull-right-container">
-                        <i class="fa fa-angle-left pull-right"></i>
-                    </span>
-                </a>
-                <ul class="treeview-menu">
-                    <li class="{{ Request::is('panel/halaman*') ? 'active' : '' }}"><a
-                            href="{{ route('halaman.index') }}"><i class="fa fa-circle-o"></i> Halaman</a></li>
-                    <li class="{{ Request::is('panel/menu*') ? 'active' : '' }}"><a
-                            href="{{ route('menu.index') }}"><i class="fa fa-circle-o"></i>
-                            Menu</a></li>
-                </ul>
-            </li>
-            <li class="treeview {{ Request::is('panel/users*', 'panel/aplikasi*') ? 'active menu-open' : '' }}">
-                <a href="#">
-                    <i class="fa fa-gears"></i> <span>Pengaturan</span>
-                    <span class="pull-right-container">
-                        <i class="fa fa-angle-left pull-right"></i>
-                    </span>
-                </a>
-                <ul class="treeview-menu">
-                    <li class="{{ Request::is('panel/users*') ? 'active' : '' }}"><a
-                            href="{{ route('users.index') }}"><i class="fa fa-circle-o"></i> Akun Pengguna</a></li>
-                    <li class="{{ Request::is('panel/aplikasi*') ? 'active' : '' }}"><a
-                            href="{{ route('aplikasi.index') }}"><i class="fa fa-circle-o"></i> Aplikasi</a></li>
-                </ul>
-            </li>
+            @if (Auth::user()->role == 'admin_komunitas')
+                <li class="{{ Request::is('panel/barber*') ? 'active' : '' }}">
+                    <a href="{{ route('barber.index') }}"><i class="fa fa-building"></i><span>Barber</span></a>
+                </li>
+                <li class="header">More</li>
+                <li class="treeview {{ Request::is('panel/users*', 'panel/aplikasi*') ? 'active menu-open' : '' }}">
+                    <a href="#">
+                        <i class="fa fa-gears"></i> <span>Pengaturan</span>
+                        <span class="pull-right-container">
+                            <i class="fa fa-angle-left pull-right"></i>
+                        </span>
+                    </a>
+                    <ul class="treeview-menu">
+                        <li class="{{ Request::is('panel/users*') ? 'active' : '' }}"><a
+                                href="{{ route('users.index') }}"><i class="fa fa-circle-o"></i> Akun Pengguna</a></li>
+                        <li class="{{ Request::is('panel/aplikasi*') ? 'active' : '' }}"><a
+                                href="{{ route('aplikasi.index') }}"><i class="fa fa-circle-o"></i> Aplikasi</a></li>
+                    </ul>
+                </li>
+            @elseif (Auth::user()->role == 'admin_barber')
+                <li class="{{ Request::is('panel/pemesanan*') ? 'active' : '' }}">
+                    <a href="{{ route('pemesanan.index') }}"><i
+                            class="fa fa-shopping-cart"></i><span>Pemesanan</span></a>
+                </li>
+                <li class="{{ Request::is('panel/transaksi*') ? 'active' : '' }}">
+                    <a href="{{ route('transaksi.index') }}"><i class="fa fa-random"></i><span>Transaksi</span></a>
+                </li>
+                <li class="{{ Request::is('panel/layanan*') ? 'active' : '' }}">
+                    <a href="{{ route('layanan.index') }}"><i class="fa fa-cubes"></i><span>Layanan</span></a>
+                </li>
+                <li class="{{ Request::is('panel/jadwal*') ? 'active' : '' }}">
+                    <a href="{{ route('jadwal.index') }}"><i class="fa fa-clock-o"></i><span>Jadwal</span></a>
+                </li>
+                <li class="{{ Request::is('panel/laporan*') ? 'active' : '' }}">
+                    <a href="{{ route('laporan.index') }}"><i class="fa fa-print"></i><span>Laporan</span></a>
+                </li>
+            @endif
             <li>
                 <a href="javascript:void();"
                     onclick="event.preventDefault(); document.getElementById('logout-form').submit();"><i

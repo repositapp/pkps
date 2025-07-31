@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -109,5 +110,38 @@ class UserController extends Controller
         $user->delete();
 
         return redirect()->route('users.index')->with(['success' => 'Data Berhasil Dihapus!']);
+    }
+
+    public function profil()
+    {
+        $user = Auth::user();
+
+        return view('mobile.profil', compact('user'));
+    }
+
+    public function updateProfil(Request $request, string $id)
+    {
+        $user = User::findOrFail($id);
+
+        $validatedData = $request->validate([
+            'name' => 'required|max:255',
+            'username' => 'required|min:5|max:255',
+            'password' => 'nullable|min:8',
+            'email' => 'required|email',
+            'telepon' => 'required',
+            'alamat' => 'required',
+        ]);
+
+        if ($request->password) {
+            $validatedData['password'] = Hash::make($validatedData['password']);
+        }
+
+        $validatedData['email_verified_at'] = now();
+        $validatedData['role'] = 'pelanggan';
+        $validatedData['status'] = true;
+
+        $user->update($validatedData);
+
+        return redirect()->route('profil')->with(['success' => 'Data Berhasil Diubah!']);
     }
 }

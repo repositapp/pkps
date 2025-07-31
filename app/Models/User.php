@@ -47,16 +47,16 @@ class User extends Authenticatable
     // Relasi
     public function barber()
     {
-        return $this->hasOne(Barber::class, 'pengguna_id');
+        return $this->hasOne(Barber::class, 'user_id');
     }
 
     public function pemesanan()
     {
-        return $this->hasMany(Pemesanan::class, 'pengguna_id');
+        return $this->hasMany(Pemesanan::class, 'user_id');
     }
 
     public function transaksi()
     {
-        return $this->hasMany(Transaksi::class, 'pengguna_id');
+        return $this->hasMany(Transaksi::class, 'user_id');
     }
 }

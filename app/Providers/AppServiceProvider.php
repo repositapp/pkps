@@ -23,7 +23,7 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Paginator::useBootstrap();
-        // $aplikasi = Aplikasi::first();
-        // View::share('aplikasi', $aplikasi);
+        $aplikasi = Aplikasi::first();
+        View::share('aplikasi', $aplikasi);
     }
 }

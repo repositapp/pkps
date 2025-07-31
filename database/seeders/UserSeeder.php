@@ -17,7 +17,7 @@ class UserSeeder extends Seeder
     {
         // Admin Komunitas
         User::create([
-            'name' => 'Admin Komunitas Baubau',
+            'name' => 'Admin Komunitas',
             'username' => 'admin',
             'email' => 'admin@themesbrand.com',
             'email_verified_at' => now(),

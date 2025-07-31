@@ -31,7 +31,7 @@
         <div class="login-box-body">
             <div class="text-center">
                 <div class="login-logo">
-                    <h2 style="margin-top: 0px; font-weight: 600; color:#000000;">Registrasi Akun
+                    <h2 style="margin-top: 0px; font-weight: 600; color:#000000;">Registrasi Barber
                     </h2>
                 </div>
             </div>
@@ -50,88 +50,134 @@
 
             <form action="{{ route('registrasi.post') }}" method="POST" enctype="multipart/form-data">
                 @csrf
-                <div class="form-group has-feedback">
-                    <input type="text" class="form-control @error('nama_pelanggan') is-invalid @enderror"
-                        id="nama_pelanggan" name="nama_pelanggan" value="{{ old('nama_pelanggan') }}"
-                        placeholder="Nama Lengkap" required>
-                    @error('nama_pelanggan')
-                        <span class="invalid-feedback" role="alert">
-                            <strong>{{ $message }}</strong>
-                        </span>
-                    @enderror
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group has-feedback">
+                            <input type="text" class="form-control @error('name') is-invalid @enderror"
+                                id="name" name="name" value="{{ old('name') }}" placeholder="Nama Lengkap"
+                                required>
+                            @error('name')
+                                <span class="invalid-feedback" role="alert">
+                                    <strong>{{ $message }}</strong>
+                                </span>
+                            @enderror
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group has-feedback">
+                            <input type="text" class="form-control @error('nama') is-invalid @enderror"
+                                id="nama" name="nama" value="{{ old('nama') }}" placeholder="Nama Barber"
+                                required>
+                            @error('nama')
+                                <span class="invalid-feedback" role="alert">
+                                    <strong>{{ $message }}</strong>
+                                </span>
+                            @enderror
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group has-feedback">
+                            <input type="text" class="form-control @error('email') is-invalid @enderror"
+                                id="email" name="email" value="{{ old('email') }}" placeholder="Email Aktif"
+                                required>
+                            @error('email')
+                                <span class="invalid-feedback" role="alert">
+                                    <strong>{{ $message }}</strong>
+                                </span>
+                            @enderror
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group has-feedback">
+                            <input type="text" class="form-control @error('telepon') is-invalid @enderror"
+                                id="telepon" name="telepon" value="{{ old('telepon') }}"
+                                placeholder="Nomor Telepon Aktif" required>
+                            @error('telepon')
+                                <span class="invalid-feedback" role="alert">
+                                    <strong>{{ $message }}</strong>
+                                </span>
+                            @enderror
+                        </div>
+                    </div>
+                    <div class="col-md-12">
+                        <div class="form-group has-feedback">
+                            <textarea class="form-control @error('alamat') is-invalid @enderror" id="alamat" name="alamat" rows="3"
+                                placeholder="Alamat Barber" required>{{ old('alamat') }}</textarea>
+                            @error('alamat')
+                                <span class="invalid-feedback" role="alert">
+                                    <strong>{{ $message }}</strong>
+                                </span>
+                            @enderror
+                        </div>
+                    </div>
+                    <div class="col-md-12">
+                        <div class="form-group has-feedback">
+                            <textarea class="form-control @error('deskripsi') is-invalid @enderror" id="deskripsi" name="deskripsi" rows="3"
+                                placeholder="Deskripsikan barber anda..." required>{{ old('deskripsi') }}</textarea>
+                            @error('deskripsi')
+                                <span class="invalid-feedback" role="alert">
+                                    <strong>{{ $message }}</strong>
+                                </span>
+                            @enderror
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group has-feedback">
+                            <input type="time" class="form-control @error('waktu_buka') is-invalid @enderror"
+                                id="waktu_buka" name="waktu_buka" value="{{ old('waktu_buka') }}"
+                                placeholder="Waktu Buka" required>
+                            <small class="text-muted">Waktu Buka</small>
+                            @error('waktu_buka')
+                                <span class="invalid-feedback" role="alert">
+                                    <strong>{{ $message }}</strong>
+                                </span>
+                            @enderror
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group has-feedback">
+                            <input type="time" class="form-control @error('waktu_tutup') is-invalid @enderror"
+                                id="waktu_tutup" name="waktu_tutup" value="{{ old('waktu_tutup') }}"
+                                placeholder="Waktu Tutup" required>
+                            <small class="text-muted">Waktu Tutup</small>
+                            @error('waktu_tutup')
+                                <span class="invalid-feedback" role="alert">
+                                    <strong>{{ $message }}</strong>
+                                </span>
+                            @enderror
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group has-feedback">
+                            <input type="text" class="form-control @error('username') is-invalid @enderror"
+                                value="{{ old('username') }}" id="username" name="username"
+                                placeholder="username">
+                            @error('username')
+                                <span class="invalid-feedback" role="alert">
+                                    <strong>{{ $message }}</strong>
+                                </span>
+                            @enderror
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group has-feedback">
+                            <input type="password" class="form-control @error('password') is-invalid @enderror"
+                                name="password" placeholder="Password" id="password-input">
+                            @error('password')
+                                <span class="invalid-feedback" role="alert">
+                                    <strong>{{ $message }}</strong>
+                                </span>
+                            @enderror
+                        </div>
+                    </div>
                 </div>
 
                 <div class="form-group has-feedback">
-                    <select class="form-control @error('jenis_kelamin') is-invalid @enderror" id="jenis_kelamin"
-                        name="jenis_kelamin" required>
-                        <option value="">-- Pilih Jenis Kelamin --</option>
-                        <option value="L" {{ old('jenis_kelamin') == 'L' ? 'selected' : '' }}>Laki-laki
-                        </option>
-                        <option value="P" {{ old('jenis_kelamin') == 'P' ? 'selected' : '' }}>Perempuan
-                        </option>
-                    </select>
-                    @error('jenis_kelamin')
-                        <span class="invalid-feedback" role="alert">
-                            <strong>{{ $message }}</strong>
-                        </span>
-                    @enderror
-                </div>
-
-                <div class="form-group has-feedback">
-                    <textarea class="form-control @error('alamat') is-invalid @enderror" id="alamat" name="alamat" rows="3"
-                        placeholder="Alamat Lengkap" required>{{ old('alamat') }}</textarea>
-                    @error('alamat')
-                        <span class="invalid-feedback" role="alert">
-                            <strong>{{ $message }}</strong>
-                        </span>
-                    @enderror
-                </div>
-
-                <div class="form-group has-feedback">
-                    <input type="text" class="form-control @error('nomor_telepon') is-invalid @enderror"
-                        id="nomor_telepon" name="nomor_telepon" value="{{ old('nomor_telepon') }}"
-                        placeholder="Nomor Telepon Aktif" required>
-                    @error('nomor_telepon')
-                        <span class="invalid-feedback" role="alert">
-                            <strong>{{ $message }}</strong>
-                        </span>
-                    @enderror
-                </div>
-
-                <div class="form-group has-feedback">
-                    <input type="text" class="form-control @error('email') is-invalid @enderror" id="email"
-                        name="email" value="{{ old('email') }}" placeholder="Email Aktif" required>
-                    @error('email')
-                        <span class="invalid-feedback" role="alert">
-                            <strong>{{ $message }}</strong>
-                        </span>
-                    @enderror
-                </div>
-
-                <div class="form-group has-feedback">
-                    <input type="file" class="form-control @error('file_ktp') is-invalid @enderror" id="file_ktp"
-                        name="file_ktp" accept=".jpg,.jpeg,.png,.pdf">
-                    <small class="text-danger">Ukuran File Maksimal 2MB berekstensi .jpg, .jpeg, .png, .pdf</small>
-                    @error('file_ktp')
-                        <span class="invalid-feedback" role="alert">
-                            <strong>{{ $message }}</strong>
-                        </span>
-                    @enderror
-                </div>
-
-                <div class="form-group has-feedback">
-                    <input type="text" class="form-control @error('username') is-invalid @enderror"
-                        value="{{ old('username') }}" id="username" name="username" placeholder="username">
-                    @error('username')
-                        <span class="invalid-feedback" role="alert">
-                            <strong>{{ $message }}</strong>
-                        </span>
-                    @enderror
-                </div>
-                <div class="form-group has-feedback">
-                    <input type="password" class="form-control @error('password') is-invalid @enderror"
-                        name="password" placeholder="Password" id="password-input">
-                    @error('password')
+                    <input type="file" class="form-control @error('gambar') is-invalid @enderror" id="gambar"
+                        name="gambar" accept=".jpg,.jpeg,.png">
+                    <small class="text-danger">Logo Barber, ukuran File Maksimal 1MB berekstensi .jpg, .jpeg,
+                        .png</small>
+                    @error('gambar')
                         <span class="invalid-feedback" role="alert">
                             <strong>{{ $message }}</strong>
                         </span>

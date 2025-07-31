@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Models\Barber;
 use App\Models\Pelanggan;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -25,24 +26,7 @@ class AuthController extends Controller
             'password' => 'required|min:8'
         ]);
 
-        if (Auth::attempt($credentials)) {
-            $user = Auth::user();
-
-            if ($user->role == 'pelanggan') {
-                $query = Pelanggan::where('user_id', auth()->user()->id)->first();
-
-                session([
-                    'pelanggan_id' => $query->id,
-                    'user_id' => $query->user_id,
-                    'nama_pelanggan' => $query->nama_pelanggan,
-                    'jenis_kelamin' => $query->jenis_kelamin,
-                    'alamat' => $query->alamat,
-                    'nomor_telepon' => $query->nomor_telepon,
-                    'nomor_sambungan' => $query->nomor_sambungan,
-                    'file_ktp' => $query->file_ktp,
-                ]);
-            }
-
+        if (Auth::guard('web')->attempt($credentials)) {
             $request->session()->regenerate();
 
             return redirect('panel/dashboard');
@@ -53,7 +37,7 @@ class AuthController extends Controller
 
     public function logout(Request $request)
     {
-        Auth::logout();
+        Auth::guard('web')->logout();
 
         $request->session()->invalidate();
 
@@ -70,49 +54,54 @@ class AuthController extends Controller
     public function register(Request $request)
     {
         $validatedData = $request->validate([
-            'nama_pelanggan' => 'required|string|max:255',
-            'jenis_kelamin' => 'required|in:L,P',
+            'name' => 'required|max:255',
+            'nama' => 'required|max:255',
+            'deskripsi' => 'nullable',
+            'email' => 'required|email:dns|unique:users',
+            'telepon' => 'required|string|max:20|unique:users,telepon',
             'alamat' => 'required',
-            'nomor_telepon' => 'required|string|max:20|unique:pelanggans,nomor_telepon',
-            'file_ktp' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:2048', // 2MB Max
-            'email' => 'required|email|unique:users,email',
+            'waktu_buka' => 'required|date_format:H:i',
+            'waktu_tutup' => 'required|date_format:H:i|after:waktu_buka',
             'username' => 'required|min:5|max:255|unique:users',
             'password' => 'required|min:8',
+            'gambar' => 'image|mimes:png,jpg,jpeg,webp|max:1024',
         ], [
-            // Pesan error kustom jika diperlukan
-            'nomor_telepon.unique' => 'Nomor telepon ini sudah digunakan oleh pelanggan lain.',
-            'file_ktp.mimes' => 'File KTP harus berupa gambar (jpg, jpeg, png) atau PDF.',
-            'file_ktp.max' => 'Ukuran file KTP maksimal 2MB.',
+            'waktu_tutup.after' => 'Waktu tutup harus setelah waktu buka.',
         ]);
 
-        $unique = User::where('username', $request->username)->exists();
+        $user = User::create([
+            'name' => $validatedData['name'],
+            'username' => $validatedData['username'],
+            'email' => $validatedData['email'],
+            'password' => Hash::make($validatedData['password']),
+            'telepon' => $validatedData['telepon'],
+            'alamat' => $validatedData['alamat'],
+            'role' => 'admin_barber',
+            'status' => true,
+        ]);
 
-        if (!empty($unique)) {
-            return redirect()->route('register')->with('error', 'Data sudah ada.');
-        } else {
-            $user = User::create([
-                'name' => $request->nama_pelanggan,
-                'username' => $request->username,
-                'email' => $request->email,
-                'email_verified_at' => now(),
-                'password' => Hash::make($request->password),
-                'avatar' => 'users-images/1J7iwiUja9gMqtHL7eIzR6RbaH0rrzZ5buklDQLy.png',
-                'role' => 'pelanggan',
-                'status' => true,
-            ]);
-
-            if ($request->file('file_ktp')) {
-                $file = $request->file('file_ktp');
-                $fileName = time() . '-' . Str::slug($validatedData['nama_pelanggan']) . '.' . $file->getClientOriginalExtension();
-                $file->storeAs('dokumen-file', $fileName);
-                $validatedData['file_ktp'] = 'dokumen-file/' . $fileName;
-            }
-
-            $validatedData['user_id'] = $user->id;
-
-            Pelanggan::create($validatedData);
-
-            return redirect()->route('login')->with('success', 'Registrasi berhasil! Silahkan login.');
+        if ($request->file('gambar')) {
+            $file = $request->file('gambar');
+            $fileName = Str::slug($validatedData['nama']) . '.' . $file->getClientOriginalExtension();
+            $file->storeAs('barbers-images', $fileName);
+            $validatedGambar = 'barbers-images/' . $fileName;
         }
+
+        Barber::create([
+            'user_id' => $user->id,
+            'nama' => $validatedData['nama'],
+            'nama_pemilik' => $validatedData['name'],
+            'deskripsi' => $validatedData['deskripsi'],
+            'alamat' => $validatedData['alamat'],
+            'telepon' => $validatedData['telepon'],
+            'email' => $validatedData['email'],
+            'gambar' => $validatedGambar,
+            'waktu_buka' => $validatedData['waktu_buka'],
+            'waktu_tutup' => $validatedData['waktu_tutup'],
+            'is_active' => false,
+            'is_verified' => false,
+        ]);
+
+        return redirect()->route('login')->with('success', 'Registrasi berhasil! Silahkan login.');
     }
 }

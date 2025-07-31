@@ -71,12 +71,12 @@
                     <div class="col-xs-12">
                         <button type="submit" class="btn btn-info btn-block btn-flat">Login</button>
                     </div>
-                    <!-- /.col -->
                 </div>
             </form>
 
             <div class="social-auth-links text-center">
-                <p>Belum punya akun? <a href="{{ route('registrasi') }}" class="text-center">Daftar Sekarang</a></p>
+                <p>Belum punya akun barber? <a href="{{ route('registrasi') }}" class="text-center">Daftar Sekarang</a>
+                </p>
             </div>
         </div>
         <!-- /.login-box-body -->
