@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Models\Aplikasi;
+use App\Models\TahunAjaran;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
@@ -25,5 +26,8 @@ class AppServiceProvider extends ServiceProvider
         Paginator::useBootstrap();
         $aplikasi = Aplikasi::first();
         View::share('aplikasi', $aplikasi);
+
+        $ta = TahunAjaran::where('status', true)->first();
+        View::share('ta', $ta);
     }
 }

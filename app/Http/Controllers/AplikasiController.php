@@ -39,7 +39,7 @@ class AplikasiController extends Controller
                 Storage::delete($aplikasi->logo);
             }
             $file = $request->file('logo');
-            $fileName = 'barber' . '.' . $file->getClientOriginalExtension();
+            $fileName = 'smp' . '.' . $file->getClientOriginalExtension();
             $file->storeAs('aplikasi-images', $fileName);
             $validatedData['logo'] = 'aplikasi-images/' . $fileName;
         }

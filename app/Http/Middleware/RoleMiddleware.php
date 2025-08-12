@@ -21,12 +21,13 @@ class RoleMiddleware
     {
         // Cek apakah user sudah login
         if (!Auth::check()) {
-            if (in_array('admin_komunitas', $roles)) {
+            // Redirect ke login yang sesuai
+            if (in_array('admin', $roles)) {
                 return redirect()->route('login');
-            } elseif (in_array('admin_barber', $roles)) {
-                return redirect()->route('login');
-            } elseif (in_array('pelanggan', $roles)) {
-                return redirect()->route('user.login');
+            } elseif (in_array('guru', $roles)) {
+                return redirect()->route('mobile.login');
+            } elseif (in_array('ortu', $roles)) {
+                return redirect()->route('mobile.login');
             }
             return redirect()->route('login');
         }
@@ -38,7 +39,7 @@ class RoleMiddleware
             return $next($request); // lanjutkan request ke route/controller
         }
 
-        // Jika role tidak cocok, tolak akses
+        // Jika role tidak cocok
         abort(403, 'Unauthorized: You do not have access to this resource.');
     }
 }

@@ -1,0 +1,22 @@
+#snackbar {
+    opacity: 0;
+    transition: opacity 0.3s ease-out;
+}
+
+#snackbar:not(.hidden) {
+    opacity: 1;
+}
+
+/* Default: spinner hidden */
+.btn-spinner {
+    display: none;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+.btn-spinner.show {
+    display: inline-flex;
+    opacity: 1;
+}
+.btn-text.hide {
+    display: none;
+}

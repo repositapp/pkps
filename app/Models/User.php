@@ -44,19 +44,13 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
-    // Relasi
-    public function barber()
+    public function guru()
     {
-        return $this->hasOne(Barber::class, 'user_id');
+        return $this->hasOne(Guru::class);
     }
 
-    public function pemesanan()
+    public function ortu()
     {
-        return $this->hasMany(Pemesanan::class, 'user_id');
-    }
-
-    public function transaksi()
-    {
-        return $this->hasMany(Transaksi::class, 'user_id');
+        return $this->hasOne(Ortu::class);
     }
 }

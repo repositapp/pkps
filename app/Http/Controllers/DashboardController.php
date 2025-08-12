@@ -3,100 +3,96 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use App\Models\Barber;
-use App\Models\Pemesanan;
-use App\Models\Transaksi;
+use App\Models\Guru;
+use App\Models\Kehadiran;
+use App\Models\Kelas;
+use App\Models\Siswa;
+use App\Models\TahunAjaran;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class DashboardController extends Controller
 {
     public function index()
     {
-        if (Auth::user()->role == 'admin_komunitas') {
-            $totalBarber = Barber::count();
-            $barberAktif = Barber::where('is_active', true)->count();
-            $barberTerverifikasi = Barber::where('is_verified', true)->count();
-            $jumlahPemesananBulanIni = Pemesanan::whereYear('created_at', date('Y'))
-                ->whereMonth('created_at', date('m'))
-                ->count();
+        // Ambil tahun ajaran aktif
+        $tahunAjaranAktif = TahunAjaran::where('status', true)->first();
+        $tahunAjaran = $tahunAjaranAktif ?? TahunAjaran::latest()->first();
 
-            $pemesananBulanan = Pemesanan::selectRaw('MONTH(created_at) as month, COUNT(*) as count')
-                ->whereYear('created_at', date('Y'))
-                ->groupBy('month')
-                ->pluck('count', 'month')
-                ->toArray();
+        // Statistik Umum
+        $totalSiswa = Siswa::count();
+        $totalKelas = Kelas::count();
+        $totalGuru = Guru::count();
 
-            $chartData = [];
-            for ($i = 1; $i <= 12; $i++) {
-                $chartData[] = $pemesananBulanan[$i] ?? 0;
-            }
+        // Siswa per Jenis Kelamin
+        $siswaLk = Siswa::where('jenis_kelamin', 'L')->count();
+        $siswaPr = Siswa::where('jenis_kelamin', 'P')->count();
 
-            $barbers = Barber::all();
-            $barberChartData = [];
+        // Kehadiran Hari Ini (jika ada data hari ini)
+        $today = now()->format('Y-m-d');
+        $kehadiranHariIni = Kehadiran::where('tanggal', $today)
+            ->where('tahun_ajaran_id', $tahunAjaran?->id)
+            ->select('status_kehadiran', DB::raw('count(*) as total'))
+            ->groupBy('status_kehadiran')
+            ->pluck('total', 'status_kehadiran');
 
-            foreach ($barbers as $barber) {
-                // Hitung jumlah pemesanan per bulan untuk barber ini
-                $pemesananPerBulan = Pemesanan::selectRaw('MONTH(created_at) as bulan, COUNT(*) as total')
-                    ->where('barber_id', $barber->id)
-                    ->whereYear('created_at', date('Y'))
-                    ->groupBy('bulan')
-                    ->pluck('total', 'bulan')
-                    ->toArray();
+        $hadir = $kehadiranHariIni['hadir'] ?? 0;
+        $izin = $kehadiranHariIni['izin'] ?? 0;
+        $sakit = $kehadiranHariIni['sakit'] ?? 0;
+        $tidakHadir = $kehadiranHariIni['tidak_hadir'] ?? 0;
 
-                // Normalisasi data ke 12 bulan (Jan–Des)
-                $data = [];
-                for ($i = 1; $i <= 12; $i++) {
-                    $data[] = $pemesananPerBulan[$i] ?? 0;
-                }
+        $totalHadirHariIni = $hadir + $izin + $sakit + $tidakHadir;
+        $persentaseHadir = $totalHadirHariIni > 0 ? round(($hadir / $totalHadirHariIni) * 100, 1) : 0;
 
-                $barberChartData[] = [
-                    'label' => $barber->nama, // atau $barber->user->name jika relasi
-                    'data' => $data,
-                    'backgroundColor' => sprintf('rgba(%d,%d,%d,0.5)', rand(0, 255), rand(0, 255), rand(0, 255)), // warna random
-                    'borderColor' => 'rgba(0,0,0,0.1)',
-                    'borderWidth' => 1
-                ];
-            }
-
-            return view('dashboard.index', compact(
-                'totalBarber',
-                'barberAktif',
-                'barberTerverifikasi',
-                'jumlahPemesananBulanIni',
-                'barberChartData'
-            ));
-        } elseif (Auth::user()->role == 'admin_barber') {
-            $barber = auth()->user()->barber;
-
-            $totalPemesanan = Pemesanan::where('barber_id', $barber->id)->count();
-            $pemesananHariIni = Pemesanan::where('barber_id', $barber->id)
-                ->where('tanggal_pemesanan', date('Y-m-d'))
-                ->count();
-            $pemesananPending = Pemesanan::where('barber_id', $barber->id)
-                ->where('status', 'menunggu')
-                ->count();
-
-            $totalPendapatan = Transaksi::whereHas('pemesanan', function ($query) use ($barber) {
-                $query->where('barber_id', $barber->id);
-            })
-                ->where('status_pembayaran', 'dibayar')
-                ->sum('jumlah');
-
-            // Pemesanan terbaru
-            $pemesananTerbaru = Pemesanan::with(['user', 'layanan'])
-                ->where('barber_id', $barber->id)
-                ->orderBy('created_at', 'desc')
-                ->limit(5)
-                ->get();
-
-            return view('dashboard.index', compact(
-                'totalPemesanan',
-                'pemesananHariIni',
-                'pemesananPending',
-                'totalPendapatan',
-                'pemesananTerbaru'
-            ));
+        // Siswa tanpa absensi hari ini
+        $siswaTanpaAbsensi = 0;
+        if ($totalHadirHariIni > 0) {
+            $siswaYangAbsen = Kehadiran::where('tanggal', $today)
+                ->where('tahun_ajaran_id', $tahunAjaran?->id)
+                ->distinct('siswa_id')
+                ->count('siswa_id');
+            $siswaTanpaAbsensi = max(0, $totalSiswa - $siswaYangAbsen);
         }
+
+        // Data untuk grafik (Kehadiran 7 hari terakhir)
+        $dataChart = Kehadiran::select(
+            DB::raw('tanggal'),
+            DB::raw('SUM(CASE WHEN status_kehadiran = "hadir" THEN 1 ELSE 0 END) as hadir'),
+            DB::raw('SUM(CASE WHEN status_kehadiran = "izin" THEN 1 ELSE 0 END) as izin'),
+            DB::raw('SUM(CASE WHEN status_kehadiran = "sakit" THEN 1 ELSE 0 END) as sakit'),
+            DB::raw('SUM(CASE WHEN status_kehadiran = "tidak_hadir" THEN 1 ELSE 0 END) as alpa')
+        )
+            ->where('tanggal', '>=', now()->subDays(6))
+            ->where('tahun_ajaran_id', $tahunAjaran?->id)
+            ->groupBy('tanggal')
+            ->orderBy('tanggal')
+            ->get();
+
+        $labels = $dataChart->pluck('tanggal')->map(fn($date) => \Carbon\Carbon::parse($date)->format('d M'))->toArray();
+        $chartHadir = $dataChart->pluck('hadir')->toArray();
+        $chartIzin = $dataChart->pluck('izin')->toArray();
+        $chartSakit = $dataChart->pluck('sakit')->toArray();
+        $chartAlpa = $dataChart->pluck('alpa')->toArray();
+
+        return view('dashboard.index', compact(
+            'totalSiswa',
+            'totalKelas',
+            'totalGuru',
+            'siswaLk',
+            'siswaPr',
+            'hadir',
+            'izin',
+            'sakit',
+            'tidakHadir',
+            'persentaseHadir',
+            'siswaTanpaAbsensi',
+            'labels',
+            'chartHadir',
+            'chartIzin',
+            'chartSakit',
+            'chartAlpa',
+            'tahunAjaran'
+        ));
     }
 }

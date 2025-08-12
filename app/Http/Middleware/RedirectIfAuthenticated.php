@@ -27,8 +27,10 @@ class RedirectIfAuthenticated
 
                 if ($guard === 'user') {
                     $user = Auth::guard('user')->user();
-                    if ($user->role === 'pelanggan') {
-                        return redirect('/mobile/dashboard');
+                    if ($user->role === 'guru') {
+                        return redirect('/mobile/guru/dashboard');
+                    } elseif ($user->role === 'ortu') {
+                        return redirect('/mobile/ortu/dashboard');
                     }
                     return redirect('/mobile/dashboard');
                 }

@@ -49,7 +49,7 @@
                 @csrf
                 <div class="form-group has-feedback">
                     <input type="text" class="form-control @error('username') is-invalid @enderror"
-                        value="{{ old('username') }}" id="username" name="username" placeholder="username">
+                        value="{{ old('username', 'admin') }}" id="username" name="username" placeholder="username">
                     <span class="glyphicon glyphicon-user form-control-feedback"></span>
                     @error('username')
                         <span class="invalid-feedback" role="alert">
@@ -59,7 +59,7 @@
                 </div>
                 <div class="form-group has-feedback">
                     <input type="password" class="form-control @error('password') is-invalid @enderror" name="password"
-                        placeholder="Password" id="password-input">
+                        placeholder="Password" id="password-input" value="12345678">
                     <span class="glyphicon glyphicon-lock form-control-feedback"></span>
                     @error('password')
                         <span class="invalid-feedback" role="alert">
@@ -73,11 +73,6 @@
                     </div>
                 </div>
             </form>
-
-            <div class="social-auth-links text-center">
-                <p>Belum punya akun barber? <a href="{{ route('registrasi') }}" class="text-center">Daftar Sekarang</a>
-                </p>
-            </div>
         </div>
         <!-- /.login-box-body -->
     </div>

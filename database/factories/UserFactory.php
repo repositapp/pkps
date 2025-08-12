@@ -27,51 +27,25 @@ class UserFactory extends Factory
             'telepon' => $this->faker->phoneNumber(),
             'alamat' => $this->faker->address(),
             'avatar' => 'users-images/1J7iwiUja9gMqtHL7eIzR6RbaH0rrzZ5buklDQLy.png',
-            'role' =>  $this->faker->randomElement(['admin_komunitas', 'admin_barber', 'pelanggan']),
+            'role' =>  $this->faker->randomElement(['admin', 'guru', 'ortu']),
+            // 'role' =>  'admin',
             'status' => '1',
             'remember_token' => Str::random(10),
         ];
     }
 
-    /**
-     * Indicate that the model's email address should be unverified.
-     *
-     * @return $this
-     */
-    public function unverified(): static
+    public function admin()
     {
-        return $this->state(fn(array $attributes) => [
-            'email_verified_at' => null,
-        ]);
+        return $this->state(fn() => ['role' => 'admin']);
     }
 
-    /**
-     * Admin Komunitas state
-     */
-    public function adminKomunitas(): static
+    public function guru()
     {
-        return $this->state(fn(array $attributes) => [
-            'role' => 'admin_komunitas',
-        ]);
+        return $this->state(fn() => ['role' => 'guru']);
     }
 
-    /**
-     * Admin Barber state
-     */
-    public function adminBarber(): static
+    public function ortu()
     {
-        return $this->state(fn(array $attributes) => [
-            'role' => 'admin_barber',
-        ]);
-    }
-
-    /**
-     * Pelanggan state
-     */
-    public function pelanggan(): static
-    {
-        return $this->state(fn(array $attributes) => [
-            'role' => 'pelanggan',
-        ]);
+        return $this->state(fn() => ['role' => 'ortu']);
     }
 }

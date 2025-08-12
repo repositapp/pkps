@@ -2,18 +2,31 @@
 
 use App\Http\Controllers\AplikasiController;
 use App\Http\Controllers\AuthController;
-use App\Http\Controllers\BarberController;
 use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\JadwalController;
-use App\Http\Controllers\LaporanController;
-use App\Http\Controllers\LayananController;
-use App\Http\Controllers\PemesananController;
-use App\Http\Controllers\TransaksiController;
-use App\Http\Controllers\UserAuthController;
+use App\Http\Controllers\GuruController;
+use App\Http\Controllers\GuruMapelController;
+use App\Http\Controllers\KelasController;
+use App\Http\Controllers\KelasSiswaController;
+use App\Http\Controllers\MobileAuthController;
+use App\Http\Controllers\MobileGuruController;
+use App\Http\Controllers\MobileOrtuController;
+use App\Http\Controllers\OrtuController;
+use App\Http\Controllers\PelajaranController;
+use App\Http\Controllers\SiswaController;
+use App\Http\Controllers\TahunAjaranController;
 use App\Http\Controllers\UserController;
-use App\Http\Controllers\UserDashboardController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
+
+
+
+
+
+
+
+
+
+
 
 
 /*
@@ -27,21 +40,10 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
+// Admin Auth
 Route::middleware('guest:web')->group(function () {
     Route::get('/login', [AuthController::class, 'index'])->name('login');
     Route::post('/authentication', [AuthController::class, 'authenticate'])->name('authentication');
-
-    Route::get('/registrasi', [AuthController::class, 'registrasi'])->name('registrasi');
-    Route::post('/registrasi', [AuthController::class, 'register'])->name('registrasi.post');
-});
-
-Route::middleware('guest:user')->group(function () {
-    Route::get('/user/login', [UserAuthController::class, 'index'])->name('user.login');
-    Route::post('/user/authentication', [UserAuthController::class, 'authenticate'])->name('user.authentication');
-
-    // Route Registrasi
-    Route::get('/user/register', [UserAuthController::class, 'registrasi'])->name('user.register');
-    Route::post('/user/register', [UserAuthController::class, 'register'])->name('user.register.post');
 });
 
 // Route::get('/force-logout', function () {
@@ -52,57 +54,71 @@ Route::middleware('guest:user')->group(function () {
 // });
 
 
-Route::prefix('panel')->middleware(['auth:web', 'role:admin_komunitas,admin_barber'])->group(function () {
+Route::prefix('panel')->middleware(['auth:web', 'role:admin'])->group(function () {
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
     // Dashboard
     Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
-    // Manajemen Barber
-    Route::resource('barber', BarberController::class)->except(['show']);
-    Route::put('/barber/{id}/toggle-status', [BarberController::class, 'toggleStatus'])->name('barber.toggleStatus');
-    Route::put('/barber/{id}/toggle-verification', [BarberController::class, 'toggleVerification'])->name('barber.toggleVerification');
-    // Manajemen Pemesanan
-    Route::get('/pemesanan', [PemesananController::class, 'index'])->name('pemesanan.index');
-    Route::get('/pemesanan/{id}', [PemesananController::class, 'show'])->name('pemesanan.show');
-    Route::put('/pemesanan/{id}/konfirmasi', [PemesananController::class, 'konfirmasi'])->name('pemesanan.konfirmasi');
-    Route::put('/pemesanan/{id}/batalkan', [PemesananController::class, 'batalkan'])->name('pemesanan.batalkan');
-    Route::put('/pemesanan/{id}/proses', [PemesananController::class, 'proses'])->name('pemesanan.proses');
-    Route::put('/pemesanan/{id}/selesai', [PemesananController::class, 'selesai'])->name('pemesanan.selesai');
-    // Manajemen Transaksi
-    Route::get('/transaksi', [TransaksiController::class, 'index'])->name('transaksi.index');
-    Route::get('/transaksi/{id}', [TransaksiController::class, 'show'])->name('transaksi.show');
-    Route::put('/transaksi/{id}/konfirmasi', [TransaksiController::class, 'konfirmasi'])->name('transaksi.konfirmasi');
-    // Jika diperlukan fitur edit transaksi (misalnya untuk mengisi metode pembayaran)
-    Route::get('/transaksi/{id}/edit', [TransaksiController::class, 'edit'])->name('transaksi.edit');
-    Route::put('/transaksi/{id}', [TransaksiController::class, 'update'])->name('transaksi.update');
-    // Manajemen Layanan
-    Route::resource('layanan', LayananController::class)->except(['show']);
-    Route::put('/layanan/{id}/toggle-status', [LayananController::class, 'toggleStatus'])->name('layanan.toggleStatus');
-    // Manajemen Jadwal
-    Route::get('/jadwal', [JadwalController::class, 'index'])->name('jadwal.index');
-    Route::get('/jadwal/create', [JadwalController::class, 'create'])->name('jadwal.create');
-    Route::post('/jadwal', [JadwalController::class, 'store'])->name('jadwal.store');
-    Route::get('/jadwal/edit/{hari}', [JadwalController::class, 'edit'])->name('jadwal.edit'); // Edit berdasarkan hari
-    Route::put('/jadwal/{hari}', [JadwalController::class, 'update'])->name('jadwal.update');
-    // Toggle status hari kerja/libur
-    Route::put('/jadwal/{id}/toggle-status', [JadwalController::class, 'toggleStatus'])->name('jadwal.toggleStatus');
-    // Laporan
-    Route::get('/laporan', [LaporanController::class, 'index'])->name('laporan.index');
-    Route::get('/laporan/cetak', [LaporanController::class, 'cetak'])->name('laporan.cetak');
-    Route::get('/laporan/export-excel', [LaporanController::class, 'exportExcel'])->name('laporan.export-excel');
+    // Manajemen Siswa
+    Route::resource('siswa', SiswaController::class)->except(['show']);
+    // Manajemen Guru
+    Route::resource('guru', GuruController::class)->except(['show']);
+    // Manajemen Ortu
+    Route::resource('ortu', OrtuController::class)->except(['show']);
+    // Manajemen Kelas
+    Route::resource('kelas', KelasController::class)->except(['show']);
+    // Manajemen Pelajaran
+    Route::resource('pelajaran', PelajaranController::class)->except(['show']);
+    // Manajemen Tahun Ajaran
+    Route::resource('tahunajaran', TahunAjaranController::class)->except(['show']);
+    // Relasi Guru - Mapel - Kelas
+    Route::resource('mapel', GuruMapelController::class)->except(['show']);
+    // Relasi Siswa - Kelas
+    Route::resource('siswakelas', KelasSiswaController::class)->except(['show']);
     // Settings
     Route::resource('users', UserController::class)->except(['show']);
     Route::resource('aplikasi', AplikasiController::class)->except(['show', 'create', 'store', 'destroy', 'edit']);
 });
 
-Route::prefix('mobile')->middleware(['auth:user', 'role:pelanggan'])->group(function () {
-    Route::post('/user/logout', [UserAuthController::class, 'logout'])->name('user.logout');
-    // Dashboard
-    Route::get('dashboard', [UserDashboardController::class, 'index'])->name('dashboard');
-    Route::get('barber', [BarberController::class, 'show'])->name('barber');
-    Route::get('barber/detail/{id}', [BarberController::class, 'detail'])->name('barber.detail');
-    Route::post('barber/detail/booking', [BarberController::class, 'booking'])->name('barber.booking');
-    Route::get('transaksi', [TransaksiController::class, 'indexTransaksi'])->name('transaksi');
-    Route::get('/transaksi/detail/{id}', [TransaksiController::class, 'detail'])->name('transaksi.detail');
-    Route::get('profil', [UserController::class, 'profil'])->name('profil');
-    Route::put('/profil/{id}', [UserController::class, 'updateProfil'])->name('profil.update');
+// Mobile Auth
+Route::middleware('guest:user')->prefix('mobile')->group(function () {
+    Route::get('/login', [MobileAuthController::class, 'login'])->name('mobile.login');
+    Route::post('/authenticate', [MobileAuthController::class, 'authenticate'])->name('mobile.authenticate');
 });
+
+// Mobile Guru
+Route::prefix('mobile/guru')->middleware(['auth:user', 'role:guru'])->group(function () {
+    Route::get('/dashboard', [MobileGuruController::class, 'dashboard'])->name('mobile.guru.dashboard');
+    Route::get('/jadwal', [MobileGuruController::class, 'jadwal'])->name('mobile.guru.jadwal');
+    Route::get('/profil', [MobileGuruController::class, 'profil'])->name('mobile.guru.profil');
+
+    // Absensi
+    Route::get('/absensi', [MobileGuruController::class, 'absensiIndex'])->name('mobile.guru.absensi.index');
+    Route::get('/absensi/kelas', [MobileGuruController::class, 'absensiPilihKelas'])->name('mobile.guru.absensi.pilih-kelas');
+    Route::get('/absensi/create/{kelas_id}', [MobileGuruController::class, 'absensiCreate'])->name('mobile.guru.absensi.create');
+    Route::post('/absensi/store', [MobileGuruController::class, 'absensiStore'])->name('mobile.guru.absensi.store');
+    Route::get('/absensi/laporan', [MobileGuruController::class, 'laporanAbsensi'])->name('mobile.guru.absensi.laporan');
+    Route::get('/absensi/laporan/cetak/{kelas_id}', [MobileGuruController::class, 'laporanAbsensiCetak'])->name('mobile.guru.absensi.laporan.cetak');
+
+    // Perilaku
+    Route::get('/perilaku', [MobileGuruController::class, 'perilakuIndex'])->name('mobile.guru.perilaku.index');
+    Route::get('/perilaku/kelas', [MobileGuruController::class, 'perilakuPilihKelas'])->name('mobile.guru.perilaku.pilih-kelas');
+    Route::get('/perilaku/create/{kelas_id}', [MobileGuruController::class, 'perilakuCreate'])->name('mobile.guru.perilaku.create');
+    Route::post('/perilaku/store', [MobileGuruController::class, 'perilakuStore'])->name('mobile.guru.perilaku.store');
+    Route::get('/perilaku/laporan', [MobileGuruController::class, 'laporanPerilaku'])->name('mobile.guru.perilaku.laporan');
+    Route::get('/perilaku/laporan/cetak/{kelas_id}', [MobileGuruController::class, 'laporanPerilakuCetak'])->name('mobile.guru.perilaku.laporan.cetak');
+
+    // Laporan
+    Route::get('/laporan', [MobileGuruController::class, 'laporanIndex'])->name('mobile.guru.laporan.index');
+    Route::get('/laporan/siswa/{siswa_id}', [MobileGuruController::class, 'laporanDetail'])->name('mobile.guru.laporan.detail');
+});
+
+// Mobile Ortu
+Route::prefix('mobile/ortu')->middleware(['auth:user', 'role:ortu'])->group(function () {
+    Route::get('/dashboard', [MobileOrtuController::class, 'dashboard'])->name('mobile.ortu.dashboard');
+    Route::get('/absensi', [MobileOrtuController::class, 'absensi'])->name('mobile.ortu.absensi');
+    Route::get('/perilaku', [MobileOrtuController::class, 'perilaku'])->name('mobile.ortu.perilaku');
+    Route::get('/profil', [MobileOrtuController::class, 'profil'])->name('mobile.ortu.profil');
+});
+
+// Logout
+Route::post('/mobile/logout', [MobileAuthController::class, 'logout'])->name('mobile.logout');

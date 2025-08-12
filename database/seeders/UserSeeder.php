@@ -17,27 +17,22 @@ class UserSeeder extends Seeder
     {
         // Admin Komunitas
         User::create([
-            'name' => 'Admin Komunitas',
+            'name' => 'Admin Sekolah',
             'username' => 'admin',
             'email' => 'admin@themesbrand.com',
             'email_verified_at' => now(),
             'password' => Hash::make('12345678'),
-            'telepon' => '081234567890',
-            'alamat' => 'Jl. Poros Baubau - Kendari',
             'avatar' => 'users-images/1J7iwiUja9gMqtHL7eIzR6RbaH0rrzZ5buklDQLy.png',
-            'role' => 'admin_komunitas',
+            'role' => 'admin',
             'status' => '1',
             'remember_token' => Str::random(10),
             'created_at' => now(),
         ]);
 
-        // Admin Barber
-        User::factory(5)->adminBarber()->create();
+        // // Pelanggan
+        // User::factory(20)->guru()->create();
 
-        // Pelanggan
-        User::factory(20)->pelanggan()->create();
-
-        // User tambahan untuk testing
-        User::factory(10)->create();
+        // // User tambahan untuk testing
+        // User::factory(10)->ortu();
     }
 }
