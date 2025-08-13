@@ -123,30 +123,77 @@ class MobileGuruController extends Controller
     }
 
     // Absensi
-    public function absensiIndex()
+    public function absensiIndex(Request $request)
     {
         $guru = Guru::where('user_id', Auth::id())->firstOrFail();
         $tahunAjaran = TahunAjaran::where('status', true)->first();
 
-        // Ambil semua kehadiran dari kelas yang diajar guru
-        $kelasIds = GuruMapel::where('guru_id', $guru->id)->pluck('kelas_id');
+        // Filter mapel, kelas, tanggal, dan search
+        $pelajaranId = $request->input('pelajaran_id');
+        $kelasId = $request->input('kelas_id');
+        $tanggal = $request->input('tanggal');
+        $search = $request->input('search');
 
-        $kehadirans = Kehadiran::whereIn('kelas_id', $kelasIds)
+        // Ambil semua mapel yang diajar oleh guru
+        $mapels = GuruMapel::where('guru_id', $guru->id)
             ->where('tahun_ajaran_id', $tahunAjaran?->id)
-            ->with(['siswa', 'kelas', 'pelajaran'])
+            ->with('pelajaran')
+            ->get()
+            ->pluck('pelajaran');
+
+        // Ambil semua kelas yang diajar oleh guru
+        $kelasIds = GuruMapel::where('guru_id', $guru->id)
+            ->where('tahun_ajaran_id', $tahunAjaran?->id)
+            ->pluck('kelas_id');
+
+        $kelasList = Kelas::whereIn('id', $kelasIds)->get();
+
+        // Filter data kehadiran
+        $kehadiran = Kehadiran::query()
+            ->when($pelajaranId, function ($query) use ($pelajaranId) {
+                return $query->where('pelajaran_id', $pelajaranId);
+            })
+            ->when($kelasId, function ($query) use ($kelasId) {
+                return $query->whereHas('siswa.kelasSiswas', function ($q) use ($kelasId) {
+                    $q->where('kelas_id', $kelasId);
+                });
+            })
+            ->when($tanggal, function ($query) use ($tanggal) {
+                return $query->where('tanggal', $tanggal);
+            })
+            ->when($search, function ($query) use ($search) {
+                return $query->whereHas('siswa', function ($q) use ($search) {
+                    $q->where('nama_siswa', 'like', "%{$search}%")
+                        ->orWhere('nis', 'like', "%{$search}%");
+                });
+            })
+            ->with(['siswa', 'kelas'])
             ->latest()
             ->paginate(10);
 
-        return view('mobile.guru.absensi.index', compact('kehadirans'));
+        return view('mobile.guru.absensi.index', compact(
+            'guru',
+            'mapels',
+            'kelasList',
+            'kehadiran',
+            'pelajaranId',
+            'kelasId',
+            'tanggal',
+            'search'
+        ));
     }
 
     // 2. Pilih Kelas untuk Absen Baru
     public function absensiPilihKelas()
     {
         $guru = Guru::where('user_id', Auth::id())->firstOrFail();
+
+        // Ambil kelas yang diajar guru (dari guru_mapels)
         $kelasList = GuruMapel::where('guru_id', $guru->id)
             ->with('kelas')
-            ->get();
+            ->get()
+            ->pluck('kelas')
+            ->unique('id');
 
         return view('mobile.guru.absensi.pilih-kelas', compact('kelasList'));
     }
@@ -156,6 +203,7 @@ class MobileGuruController extends Controller
     {
         $kelas = Kelas::findOrFail($kelas_id);
         $guru = Guru::where('user_id', Auth::id())->firstOrFail();
+        $tahunAjaran = TahunAjaran::where('status', true)->first();
 
         // Cek apakah guru mengajar kelas ini
         $allowed = GuruMapel::where('guru_id', $guru->id)
@@ -166,6 +214,16 @@ class MobileGuruController extends Controller
             return redirect()->route('mobile.guru.absensi.pilih-kelas')
                 ->with('error', 'Anda tidak mengajar kelas ini.');
         }
+
+        // Ambil mata pelajaran yang diajar guru di kelas ini
+        $mapels = GuruMapel::where('guru_id', $guru->id)
+            ->where('kelas_id', $kelas_id)
+            ->where('tahun_ajaran_id', $tahunAjaran->id)
+            ->with('pelajaran')
+            ->get()
+            ->pluck('pelajaran')
+            ->unique('id')
+            ->values();
 
         // Ambil siswa di kelas ini
         $siswas = Siswa::whereHas('kelasSiswas', function ($q) use ($kelas_id) {
@@ -178,7 +236,7 @@ class MobileGuruController extends Controller
             ->with('pelajaran')
             ->first()?->pelajaran;
 
-        return view('mobile.guru.absensi.create', compact('kelas', 'siswas', 'pelajaran'));
+        return view('mobile.guru.absensi.create', compact('kelas', 'siswas', 'pelajaran', 'mapels'));
     }
 
     // 4. Simpan Absensi

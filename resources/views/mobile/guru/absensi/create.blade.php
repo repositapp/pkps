@@ -4,17 +4,24 @@
     Tambah Absensi
 @endsection
 @section('content')
-    <div class="bg-white rounded-lg shadow-md p-4 mb-6">
-        <h2 class="font-bold text-lg">Absensi - {{ $kelas->nama_kelas }}</h2>
-        <p class="text-gray-600 text-sm">Pelajaran: {{ $pelajaran?->nama_mapel }}</p>
+    <div class="bg-white rounded-lg shadow-md p-4 mb-4">
+        <h1 class="text-lg font-bold">Tambah Absensi Siswa</h1>
+        <p class="text-sm text-gray-500">{{ $kelas->nama_kelas }}</p>
         <p class="text-gray-600 text-sm">Tanggal: {{ now()->format('d F Y') }}</p>
     </div>
 
-    <form action="{{ route('mobile.guru.absensi.store') }}" method="POST">
+    <form action="{{ route('mobile.guru.absensi.store') }}" method="POST" class="space-y-4">
         @csrf
         <input type="hidden" name="kelas_id" value="{{ $kelas->id }}">
-        <input type="hidden" name="pelajaran_id" value="{{ $pelajaran?->id }}">
+        <!-- Pilih Mapel -->
+        <select name="pelajaran_id" class="w-full border rounded-lg p-2 text-sm">
+            <option value="">Pilih Mata Pelajaran</option>
+            @foreach ($mapels as $mapel)
+                <option value="{{ $mapel->id }}">{{ $mapel->nama_mapel }}</option>
+            @endforeach
+        </select>
 
+        <!-- Daftar Siswa -->
         <div class="space-y-3">
             @foreach ($siswas as $siswa)
                 <div class="bg-white rounded-lg shadow-md p-4">
@@ -42,9 +49,11 @@
             @endforeach
         </div>
 
-        <button type="submit"
-            class="w-full bg-primary text-white font-bold py-3 px-4 rounded-lg shadow hover:bg-blue-600 mt-6">
-            Simpan Absensi
-        </button>
+        <!-- Tombol -->
+        <div class="flex justify-between mt-2">
+            <button type="submit"
+                class="w-full bg-primary text-white text-sm font-bold py-2 px-4 rounded-lg shadow hover:bg-blue-600 mt-6">Simpan
+                Absen</button>
+        </div>
     </form>
 @endsection

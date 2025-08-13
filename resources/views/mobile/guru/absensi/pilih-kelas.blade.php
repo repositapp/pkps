@@ -1,4 +1,3 @@
-<!-- resources/views/mobile/guru/absensi/pilih-kelas.blade.php -->
 @extends('mobile.layouts.mobile')
 @section('title')
     Pilih Kelas

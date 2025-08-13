@@ -5,7 +5,7 @@
     <div class="space-y-4">
 
         <!-- Bagian Header -->
-        <div class="bg-blue-500 rounded-b-3xl p-5 text-center text-white">
+        <div class="bg-blue-500 rounded-b-3xl text-center text-white">
             <div class="flex justify-center">
                 <i class="las la-user-circle text-6xl"></i>
             </div>
