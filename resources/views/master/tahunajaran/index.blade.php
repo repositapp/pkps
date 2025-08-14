@@ -61,7 +61,7 @@
                                     @if ($ta->status)
                                         <span class="label label-success">Aktif</span>
                                     @else
-                                        <span class="label label-default">Tidak Aktif</span>
+                                        <span class="label label-danger">Tidak Aktif</span>
                                     @endif
                                 </td>
                                 <td class="text-center">
