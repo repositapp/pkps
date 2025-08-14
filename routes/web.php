@@ -20,15 +20,6 @@ use Illuminate\Support\Facades\Route;
 
 
 
-
-
-
-
-
-
-
-
-
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -60,10 +51,13 @@ Route::prefix('panel')->middleware(['auth:web', 'role:admin'])->group(function (
     Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
     // Manajemen Siswa
     Route::resource('siswa', SiswaController::class)->except(['show']);
+    Route::post('/siswa/import', [SiswaController::class, 'import'])->name('siswa.import');
     // Manajemen Guru
     Route::resource('guru', GuruController::class)->except(['show']);
+    Route::post('/guru/import', [GuruController::class, 'import'])->name('guru.import');
     // Manajemen Ortu
     Route::resource('ortu', OrtuController::class)->except(['show']);
+    Route::post('/ortu/import', [OrtuController::class, 'import'])->name('ortu.import');
     // Manajemen Kelas
     Route::resource('kelas', KelasController::class)->except(['show']);
     // Manajemen Pelajaran
@@ -72,8 +66,10 @@ Route::prefix('panel')->middleware(['auth:web', 'role:admin'])->group(function (
     Route::resource('tahunajaran', TahunAjaranController::class)->except(['show']);
     // Relasi Guru - Mapel - Kelas
     Route::resource('mapel', GuruMapelController::class)->except(['show']);
+    Route::post('/mapel/import', [GuruMapelController::class, 'import'])->name('mapel.import');
     // Relasi Siswa - Kelas
     Route::resource('siswakelas', KelasSiswaController::class)->except(['show']);
+    Route::post('/siswakelas/import', [KelasSiswaController::class, 'import'])->name('siswakelas.import');
     // Settings
     Route::resource('users', UserController::class)->except(['show']);
     Route::resource('aplikasi', AplikasiController::class)->except(['show', 'create', 'store', 'destroy', 'edit']);

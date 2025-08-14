@@ -37,88 +37,209 @@ class DatabaseSeeder extends Seeder
         ]);
 
         // Buat tahun ajaran aktif
-        $tahunAktif = TahunAjaran::create([
+        TahunAjaran::create([
             'tahun_ajaran' => '2023/2024',
             'semester' => 'Ganjil',
+            'status' => false
+        ]);
+        TahunAjaran::create([
+            'tahun_ajaran' => '2023/2024',
+            'semester' => 'Genap',
+            'status' => false
+        ]);
+        TahunAjaran::create([
+            'tahun_ajaran' => '2024/2025',
+            'semester' => 'Ganjil',
+            'status' => false
+        ]);
+        TahunAjaran::create([
+            'tahun_ajaran' => '2024/2025',
+            'semester' => 'Genap',
+            'status' => false
+        ]);
+        TahunAjaran::create([
+            'tahun_ajaran' => '2025/2026',
+            'semester' => 'Ganjil',
             'status' => true
+        ]);
+        TahunAjaran::create([
+            'tahun_ajaran' => '2025/2026',
+            'semester' => 'Genap',
+            'status' => false
         ]);
 
         // Tahun ajaran lain
         TahunAjaran::factory(2)->create();
 
         // Buat kelas
-        $kelas = Kelas::factory(15)->create();
+        // Kelas::factory(15)->create();
+        Kelas::updateOrCreate([
+            'nama_kelas' => '7A',
+        ]);
+        Kelas::updateOrCreate([
+            'nama_kelas' => '7B',
+        ]);
+        Kelas::updateOrCreate([
+            'nama_kelas' => '7C',
+        ]);
+        Kelas::updateOrCreate([
+            'nama_kelas' => '8A',
+        ]);
+        Kelas::updateOrCreate([
+            'nama_kelas' => '8B',
+        ]);
+        Kelas::updateOrCreate([
+            'nama_kelas' => '8C',
+        ]);
+        Kelas::updateOrCreate([
+            'nama_kelas' => '9A',
+        ]);
+        Kelas::updateOrCreate([
+            'nama_kelas' => '9B',
+        ]);
+        Kelas::updateOrCreate([
+            'nama_kelas' => '9C',
+        ]);
 
         // Buat pelajaran
-        $pelajaran = Pelajaran::factory(11)->create();
+        // Pelajaran::factory(11)->create();
+        Pelajaran::updateOrCreate([
+            'nama_mapel' => 'Ilmu Pengetahuan Sosial (IPS)',
+        ]);
+        Pelajaran::updateOrCreate([
+            'nama_mapel' => 'Bahasa Indonesia',
+        ]);
+        Pelajaran::updateOrCreate([
+            'nama_mapel' => 'Informatika',
+        ]);
+        Pelajaran::updateOrCreate([
+            'nama_mapel' => 'Seni, Budaya dan Prakarya',
+        ]);
+        Pelajaran::updateOrCreate([
+            'nama_mapel' => 'Pendidikan Pancasila',
+        ]);
+        Pelajaran::updateOrCreate([
+            'nama_mapel' => 'Pendidikan Agama Islam dan Budi Pekerti',
+        ]);
+        Pelajaran::updateOrCreate([
+            'nama_mapel' => 'Matematika (Umum)',
+        ]);
+        Pelajaran::updateOrCreate([
+            'nama_mapel' => 'Pendidikan Jasmani, Olahraga, dan Kesehatan',
+        ]);
+        Pelajaran::updateOrCreate([
+            'nama_mapel' => 'Ilmu Pengetahuan Alam (IPA)',
+        ]);
+        Pelajaran::updateOrCreate([
+            'nama_mapel' => 'Project Penguatan Profil Pelajar Pancasila',
+        ]);
+        Pelajaran::updateOrCreate([
+            'nama_mapel' => 'Bahasa Inggris',
+        ]);
+        Pelajaran::updateOrCreate([
+            'nama_mapel' => 'Muatan Lokal Potensi Daerah',
+        ]);
+        Pelajaran::updateOrCreate([
+            'nama_mapel' => 'Bimbingan dan Konseling/Konselor (BP/BK)',
+        ]);
+        Pelajaran::updateOrCreate([
+            'nama_mapel' => 'Kearifan Lokal',
+        ]);
+        Pelajaran::updateOrCreate([
+            'nama_mapel' => 'Gaya Hidup Berkelanjutan',
+        ]);
+        Pelajaran::updateOrCreate([
+            'nama_mapel' => 'Suara Demokrasi',
+        ]);
+        Pelajaran::updateOrCreate([
+            'nama_mapel' => 'Bangunlah Jiwa dan Raganya',
+        ]);
+        Pelajaran::updateOrCreate([
+            'nama_mapel' => 'Rekayasa dan Teknologi',
+        ]);
+        Pelajaran::updateOrCreate([
+            'nama_mapel' => 'Bhineka Tunggal Ika',
+        ]);
+        Pelajaran::updateOrCreate([
+            'nama_mapel' => 'Seni dan Budaya',
+        ]);
+        Pelajaran::updateOrCreate([
+            'nama_mapel' => 'Prakarya',
+        ]);
+        Pelajaran::updateOrCreate([
+            'nama_mapel' => 'Pendidikan Pancasila dan Kewarganegaraan',
+        ]);
+        Pelajaran::updateOrCreate([
+            'nama_mapel' => 'Teknologi Informasi dan Komunikasi',
+        ]);
 
-        // Buat guru
-        $gurus = Guru::factory(5)->create();
+        // // Buat guru
+        // $gurus = Guru::factory(5)->create();
 
-        // Hubungkan guru ke user
-        foreach ($gurus as $guru) {
-            $user = User::create([
-                'name' => $guru->nama_lengkap,
-                'username' => strtolower(str_replace(' ', '_', $guru->nama_lengkap)) . random_int(10, 99),
-                'email' => strtolower(str_replace(' ', '', $guru->nama_lengkap)) . '@guru.com',
-                'email_verified_at' => now(),
-                'password' => Hash::make('12345678'),
-                'avatar' => 'users-images/1J7iwiUja9gMqtHL7eIzR6RbaH0rrzZ5buklDQLy.png',
-                'role' => 'guru',
-                'status' => '1',
-                'remember_token' => Str::random(10),
-                'created_at' => now(),
-            ]);
-            $guru->update(['user_id' => $user->id]);
+        // // Hubungkan guru ke user
+        // foreach ($gurus as $guru) {
+        //     $user = User::create([
+        //         'name' => $guru->nama_lengkap,
+        //         'username' => strtolower(str_replace(' ', '_', $guru->nama_lengkap)) . random_int(10, 99),
+        //         'email' => strtolower(str_replace(' ', '', $guru->nama_lengkap)) . '@guru.com',
+        //         'email_verified_at' => now(),
+        //         'password' => Hash::make('12345678'),
+        //         'avatar' => 'users-images/1J7iwiUja9gMqtHL7eIzR6RbaH0rrzZ5buklDQLy.png',
+        //         'role' => 'guru',
+        //         'status' => '1',
+        //         'remember_token' => Str::random(10),
+        //         'created_at' => now(),
+        //     ]);
+        //     $guru->update(['user_id' => $user->id]);
 
-            // Set guru mengajar 1-2 pelajaran di 1-2 kelas
-            $kelasRand = $kelas->random(rand(1, 2));
-            $pelajaranRand = $pelajaran->random(rand(1, 2));
+        //     // Set guru mengajar 1-2 pelajaran di 1-2 kelas
+        //     $kelasRand = $kelas->random(rand(1, 2));
+        //     $pelajaranRand = $pelajaran->random(rand(1, 2));
 
-            foreach ($kelasRand as $k) {
-                foreach ($pelajaranRand as $p) {
-                    GuruMapel::create([
-                        'guru_id' => $guru->id,
-                        'pelajaran_id' => $p->id,
-                        'kelas_id' => $k->id,
-                        'tahun_ajaran_id' => $tahunAktif->id,
-                        'hari' => $faker->randomElement(['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu']),
-                        'mulai' => '07:00',
-                        'selesai' => '09:00',
-                    ]);
-                }
-            }
-        }
+        //     foreach ($kelasRand as $k) {
+        //         foreach ($pelajaranRand as $p) {
+        //             GuruMapel::create([
+        //                 'guru_id' => $guru->id,
+        //                 'pelajaran_id' => $p->id,
+        //                 'kelas_id' => $k->id,
+        //                 'tahun_ajaran_id' => $tahunAktif->id,
+        //                 'hari' => $faker->randomElement(['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu']),
+        //                 'mulai' => '07:00',
+        //                 'selesai' => '09:00',
+        //             ]);
+        //         }
+        //     }
+        // }
 
-        // Buat siswa
-        $siswas = Siswa::factory(10)->create();
+        // // Buat siswa
+        // $siswas = Siswa::factory(10)->create();
 
-        // Buat ortu & hubungkan
-        foreach ($siswas as $siswa) {
-            $ortu = Ortu::factory()->create(['siswa_id' => $siswa->id]);
+        // // Buat ortu & hubungkan
+        // foreach ($siswas as $siswa) {
+        //     $ortu = Ortu::factory()->create(['siswa_id' => $siswa->id]);
 
-            $user = User::create([
-                'name' => $ortu->nama_wali,
-                'username' => strtolower(str_replace(' ', '_', $ortu->nama_wali)) . random_int(10, 99),
-                'email' => strtolower(str_replace(' ', '', $ortu->nama_wali)) . '@ortu.com',
-                'email_verified_at' => now(),
-                'password' => Hash::make('12345678'),
-                'avatar' => 'users-images/1J7iwiUja9gMqtHL7eIzR6RbaH0rrzZ5buklDQLy.png',
-                'role' => 'ortu',
-                'status' => '1',
-                'remember_token' => Str::random(10),
-                'created_at' => now(),
-            ]);
-            $ortu->update(['user_id' => $user->id]);
+        //     $user = User::create([
+        //         'name' => $ortu->nama_wali,
+        //         'username' => strtolower(str_replace(' ', '_', $ortu->nama_wali)) . random_int(10, 99),
+        //         'email' => strtolower(str_replace(' ', '', $ortu->nama_wali)) . '@ortu.com',
+        //         'email_verified_at' => now(),
+        //         'password' => Hash::make('12345678'),
+        //         'avatar' => 'users-images/1J7iwiUja9gMqtHL7eIzR6RbaH0rrzZ5buklDQLy.png',
+        //         'role' => 'ortu',
+        //         'status' => '1',
+        //         'remember_token' => Str::random(10),
+        //         'created_at' => now(),
+        //     ]);
+        //     $ortu->update(['user_id' => $user->id]);
 
-            // Masukkan siswa ke kelas
-            $kelasPilih = $kelas->random();
-            KelasSiswa::create([
-                'siswa_id' => $siswa->id,
-                'kelas_id' => $kelasPilih->id,
-                'tahun_ajaran_id' => $tahunAktif->id
-            ]);
-        }
+        //     // Masukkan siswa ke kelas
+        //     $kelasPilih = $kelas->random();
+        //     KelasSiswa::create([
+        //         'siswa_id' => $siswa->id,
+        //         'kelas_id' => $kelasPilih->id,
+        //         'tahun_ajaran_id' => $tahunAktif->id
+        //     ]);
+        // }
 
         Aplikasi::updateOrCreate([
             'nama_lembaga' => 'SMP Negeri 9 Buton',

@@ -3,12 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Imports\GuruMapelImport;
 use App\Models\Guru;
 use App\Models\GuruMapel;
 use App\Models\Kelas;
 use App\Models\Pelajaran;
 use App\Models\TahunAjaran;
 use Illuminate\Http\Request;
+use Maatwebsite\Excel\Facades\Excel;
 
 class GuruMapelController extends Controller
 {
@@ -119,5 +121,17 @@ class GuruMapelController extends Controller
         $guruMapel->delete();
 
         return redirect()->route('mapel.index')->with(['success' => 'Relasi berhasil dihapus!']);
+    }
+
+    public function import(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|mimes:xlsx,xls',
+        ]);
+
+        $import = new GuruMapelImport();
+        Excel::import($import, $request->file('file'));
+
+        return back()->with('success', 'Data relasi guru - mata pelajaran - kelas berhasil diimport!');
     }
 }

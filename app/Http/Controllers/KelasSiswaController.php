@@ -3,11 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Imports\KelasSiswaImport;
 use App\Models\Kelas;
 use App\Models\KelasSiswa;
 use App\Models\Siswa;
 use App\Models\TahunAjaran;
 use Illuminate\Http\Request;
+use Maatwebsite\Excel\Facades\Excel;
 
 class KelasSiswaController extends Controller
 {
@@ -113,5 +115,17 @@ class KelasSiswaController extends Controller
         $kelasSiswa->delete();
 
         return redirect()->route('siswakelas.index')->with(['success' => 'Relasi berhasil dihapus!']);
+    }
+
+    public function import(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|mimes:xlsx,xls',
+        ]);
+
+        $import = new KelasSiswaImport();
+        Excel::import($import, $request->file('file'));
+
+        return back()->with('success', 'Data relasi guru - mata pelajaran - kelas berhasil diimport!');
     }
 }

@@ -3,11 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Imports\GuruImport;
 use App\Models\Guru;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
+use Maatwebsite\Excel\Facades\Excel;
 
 class GuruController extends Controller
 {
@@ -101,5 +103,20 @@ class GuruController extends Controller
         $guru->delete();
 
         return redirect()->route('guru.index')->with(['success' => 'Data Guru Berhasil Dihapus!']);
+    }
+
+    public function import(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|mimes:xlsx,xls',
+        ]);
+
+        $import = new GuruImport();
+        Excel::import($import, $request->file('file'));
+
+        return redirect()->back()->with(
+            'success',
+            "{$import->successCount} data guru berhasil diimport, {$import->skippedCount} data dilewati."
+        );
     }
 }

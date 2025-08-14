@@ -34,6 +34,10 @@
                         </form>
                     </div>
                     <div class="col-md-6 text-right">
+                        <button type="button" class="btn btn-social btn-sm btn-default" data-toggle="modal"
+                            data-target="#modal-default">
+                            <i class="fa fa-file-excel-o"></i> Import
+                        </button>
                         <a href="{{ route('mapel.create') }}" class="btn btn-social btn-sm btn-info">
                             <i class="fa fa-plus"></i> Tambah Relasi
                         </a>
@@ -100,4 +104,34 @@
             </div>
         </div>
     </section>
+
+    <div class="modal fade" id="modal-default">
+        <div class="modal-dialog">
+            <form action="{{ route('mapel.import') }}" method="POST" enctype="multipart/form-data">
+                @csrf
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title">Import Data Relasi Guru - Mata Pelajaran - Kelas</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-horizontal">
+                            <div class="form-group">
+                                <label for="file" class="col-sm-3 control-label">Pilih File Excel:</label>
+
+                                <div class="col-sm-9">
+                                    <input type="file" name="file" id="file" class="form-control" required>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Import Data</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
 @endsection

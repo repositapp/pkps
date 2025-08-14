@@ -3,12 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Imports\OrtuImport;
 use App\Models\Ortu;
 use App\Models\Siswa;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
+use Maatwebsite\Excel\Facades\Excel;
 
 class OrtuController extends Controller
 {
@@ -116,5 +118,16 @@ class OrtuController extends Controller
         $ortu->delete();
 
         return redirect()->route('ortu.index')->with(['success' => 'Data Orang Tua berhasil dihapus!']);
+    }
+
+    public function import(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|mimes:xlsx,xls',
+        ]);
+
+        Excel::import(new OrtuImport, $request->file('file'));
+
+        return redirect()->back()->with('success', 'Data orang tua siswa berhasil diimport.');
     }
 }
