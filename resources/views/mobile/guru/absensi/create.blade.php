@@ -6,7 +6,7 @@
 @section('content')
     <div class="bg-white rounded-lg shadow-md p-4 mb-4">
         <h1 class="text-lg font-bold">Tambah Absensi Siswa</h1>
-        <p class="text-sm text-gray-500">{{ $kelas->nama_kelas }}</p>
+        <p class="text-sm text-gray-500">Kelas {{ $kelas->nama_kelas }}</p>
         <p class="text-gray-600 text-sm">Tanggal: {{ now()->format('d F Y') }}</p>
     </div>
 

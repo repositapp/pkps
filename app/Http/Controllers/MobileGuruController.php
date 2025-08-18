@@ -402,21 +402,63 @@ class MobileGuruController extends Controller
 
 
     // Perilaku
-    public function perilakuIndex()
+    public function perilakuIndex(Request $request)
     {
         $guru = Guru::where('user_id', Auth::id())->firstOrFail();
         $tahunAjaran = TahunAjaran::where('status', true)->first();
 
-        // Ambil semua perilaku dari kelas yang diajar guru
-        $kelasIds = GuruMapel::where('guru_id', $guru->id)->pluck('kelas_id');
+        // Filter mapel dan kelas
+        $pelajaranId = $request->input('pelajaran_id');
+        $kelasId = $request->input('kelas_id');
+        $tanggal = $request->input('tanggal');
+        $search = $request->input('search');
 
-        $perilakus = Perilaku::whereIn('kelas_id', $kelasIds)
+        // Ambil semua mapel yang diajar oleh guru
+        $mapels = GuruMapel::where('guru_id', $guru->id)
             ->where('tahun_ajaran_id', $tahunAjaran?->id)
-            ->with(['siswa', 'kelas', 'pelajaran'])
+            ->with('pelajaran')
+            ->get()
+            ->pluck('pelajaran');
+
+        // Ambil semua kelas yang diajar oleh guru
+        $kelasIds = GuruMapel::where('guru_id', $guru->id)
+            ->where('tahun_ajaran_id', $tahunAjaran?->id)
+            ->pluck('kelas_id');
+
+        $kelasList = Kelas::whereIn('id', $kelasIds)->get();
+
+        // Filter data perilaku berdasarkan pilihan guru
+        $perilaku = Perilaku::query()
+            ->when($pelajaranId, function ($query) use ($pelajaranId) {
+                return $query->where('pelajaran_id', $pelajaranId);
+            })
+            ->when($kelasId, function ($query) use ($kelasId) {
+                return $query->whereHas('siswa.kelasSiswas', function ($q) use ($kelasId) {
+                    $q->where('kelas_id', $kelasId);
+                });
+            })
+            ->when($tanggal, function ($query) use ($tanggal) {
+                return $query->where('tanggal', $tanggal);
+            })
+            ->when($search, function ($query) use ($search) {
+                return $query->whereHas('siswa', function ($q) use ($search) {
+                    $q->where('nama_lengkap', 'like', '%' . $search . '%');
+                });
+            })
+            ->with(['siswa', 'kelas'])
             ->latest()
             ->paginate(10);
 
-        return view('mobile.guru.perilaku.index', compact('perilakus'));
+        return view('mobile.guru.perilaku.index', compact(
+            'guru',
+            'mapels',
+            'kelasList',
+            'perilaku',
+            'pelajaranId',
+            'kelasId',
+            'tanggal',
+            'search'
+        ));
     }
 
     // 2. Pilih Kelas untuk Catatan Perilaku Baru
@@ -425,49 +467,52 @@ class MobileGuruController extends Controller
         $guru = Guru::where('user_id', Auth::id())->firstOrFail();
         $kelasList = GuruMapel::where('guru_id', $guru->id)
             ->with('kelas')
-            ->get();
+            ->get()
+            ->pluck('kelas')
+            ->unique('id');
 
         return view('mobile.guru.perilaku.pilih-kelas', compact('kelasList'));
+
+        $guru = Guru::where('user_id', Auth::id())->firstOrFail();
     }
 
     // 3. Form Tambah Perilaku (Daftar Siswa)
-    public function perilakuCreate($kelas_id)
+     public function perilakuCreate($kelas_id)
     {
-        $kelas = Kelas::findOrFail($kelas_id);
         $guru = Guru::where('user_id', Auth::id())->firstOrFail();
+        $tahunAjaran = TahunAjaran::where('status', true)->first();
 
-        // Cek apakah guru mengajar kelas ini
+        // Ambil kelas yang diajar oleh guru
         $allowed = GuruMapel::where('guru_id', $guru->id)
             ->where('kelas_id', $kelas_id)
             ->exists();
 
         if (!$allowed) {
-            return redirect()->route('mobile.guru.perilaku.pilih-kelas')
+            return redirect()->route('mobile.guru.perilaku.index')
                 ->with('error', 'Anda tidak mengajar kelas ini.');
         }
 
-        // Ambil siswa di kelas ini
-        $siswas = Siswa::whereHas('kelasSiswas', function ($q) use ($kelas_id) {
-            $q->where('kelas_id', $kelas_id);
-        })->get();
-
-        // Ambil pelajaran yang diajar guru di kelas ini
+        $kelas = Kelas::findOrFail($kelas_id);
         $pelajaran = GuruMapel::where('guru_id', $guru->id)
             ->where('kelas_id', $kelas_id)
             ->with('pelajaran')
             ->first()?->pelajaran;
 
-        return view('mobile.guru.perilaku.create', compact('kelas', 'siswas', 'pelajaran'));
+        $siswas = Siswa::whereHas('kelasSiswas', function ($q) use ($kelas_id) {
+            $q->where('kelas_id', $kelas_id);
+        })->get();
+
+        return view('mobile.guru.perilaku.create', compact('kelas', 'pelajaran', 'siswas'));
     }
 
     // 4. Simpan Catatan Perilaku
     public function perilakuStore(Request $request)
     {
         $request->validate([
-            'kelas_id' => 'required|exists:kelas,id',
+            'siswa_id' => 'required|exists:siswas,id',
             'pelajaran_id' => 'required|exists:pelajarans,id',
-            'data.*.kategori' => 'required|in:taat,disiplin,melanggar',
-            'data.*.catatan' => 'required|string|max:500',
+            'kategori_perilaku' => 'required|in:taat,disiplin,melanggar',
+            'catatan' => 'required|string|max:500',
         ]);
 
         $guru = Guru::where('user_id', Auth::id())->firstOrFail();
@@ -477,22 +522,17 @@ class MobileGuruController extends Controller
             return back()->with('error', 'Tidak ada tahun ajaran aktif.');
         }
 
-        $today = now()->format('Y-m-d');
+        Perilaku::create([
+            'siswa_id' => $request->siswa_id,
+            'kelas_id' => $request->kelas_id,
+            'pelajaran_id' => $request->pelajaran_id,
+            'tanggal' => now()->format('Y-m-d'),
+            'kategori_perilaku' => $request->kategori_perilaku,
+            'catatan' => $request->catatan,
+            'tahun_ajaran_id' => $tahunAjaran->id,
+        ]);
 
-        foreach ($request->data as $siswa_id => $data) {
-            Perilaku::create([
-                'siswa_id' => $siswa_id,
-                'kelas_id' => $request->kelas_id,
-                'pelajaran_id' => $request->pelajaran_id,
-                'tanggal' => $today,
-                'kategori_perilaku' => $data['kategori'],
-                'catatan' => $data['catatan'],
-                'tahun_ajaran_id' => $tahunAjaran->id,
-            ]);
-        }
-
-        return redirect()->route('mobile.guru.perilaku.index')
-            ->with('success', 'Catatan perilaku berhasil disimpan!');
+        return redirect()->route('mobile.guru.perilaku.index')->with('success', 'Catatan perilaku berhasil disimpan!');
     }
 
     public function laporanPerilaku(Request $request)

@@ -53,6 +53,14 @@
                     <a href="{{ route('mobile.guru.dashboard') }}" class="mr-3">
                         <i class="las la-angle-left text-xl text-gray-600"></i>
                     </a>
+                @elseif (Request::is('mobile/guru/absensi/kelas'))
+                    <a href="{{ route('mobile.guru.absensi.index') }}" class="mr-3">
+                        <i class="las la-angle-left text-xl text-gray-600"></i>
+                    </a>
+                @elseif (Request::is('mobile/guru/perilaku/kelas'))
+                    <a href="{{ route('mobile.guru.perilaku.index') }}" class="mr-3">
+                        <i class="las la-angle-left text-xl text-gray-600"></i>
+                    </a>
                 @else
                     <a href="{{ url()->previous() }}" class="mr-3">
                         <i class="las la-angle-left text-xl text-gray-600"></i>

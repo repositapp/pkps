@@ -88,7 +88,7 @@
 
         {{-- Tombol Tambah --}}
         <a href="{{ route('mobile.guru.absensi.pilih-kelas') }}"
-            class="fixed bottom-16 right-6 bg-primary text-white rounded-full p-4 shadow-lg">
+            class="fixed bottom-20 right-6 bg-primary text-white rounded-full w-12 h-12 flex items-center justify-center shadow-lg">
             <i class="las la-plus text-2xl"></i>
         </a>
 
